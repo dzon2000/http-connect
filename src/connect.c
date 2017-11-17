@@ -45,9 +45,9 @@ header createHTTPHeader(char* host, char *port, char* path, method_type method) 
 }
 
 int main() {
-	char *host = "www.grok.com";
-	char *port = "8080";
-	char *path = "/tomcat.png";
+	char *host = "bla-opengrok.ptcnet.ptc.com";
+	char *port = "80";
+	char *path = "/raw/wnc-wnc.cairo-cps03/Windchill/DevModules/Carambola/src_web/config/actions/Carambola-actions.xml";
 	header h = createHTTPHeader(host, port, path, GET);
 	char *request = buildRequest(h);
 	puts(request);
@@ -89,7 +89,7 @@ int main() {
 	int byte_count;
 
 	FILE *fp;
-	fp = fopen("tomcat.png", "wb");
+	fp = fopen("Carambola-actions.xml", "wb");
 
 	while((byte_count = read(socket_desc, buf, sizeof(buf))) != 0) {
 		fwrite(buf, byte_count, 1, fp);
