@@ -1,0 +1,6 @@
+# Vim swp files
+*.swp
+# Vimdiff files
+*.orig
+# Out programs
+*.out
