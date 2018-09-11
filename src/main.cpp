@@ -109,7 +109,8 @@ Url::Url(string urlStr) {
 
 string Url::ToString() {
 	stringstream ss;
-	ss << "Host: " << host << endl << "Port: " << port << endl << "Path: " << path << endl;	return ss.str();
+	ss << "Host: " << host << endl << "Port: " << port << endl << "Path: " << path << endl;
+	return ss.str();
 }
 
 
@@ -143,17 +144,6 @@ ConnectionStream Url::open() {
 }
 
 int main(int argc, char *argv[]) {
-	/*string s (argv[1]);
-	regex rx("https?:\/\/([a-zA-Z0-9\.]+):?(\d*)(.*)");
-	smatch match;
-	cout << "Target sequence: " << s << endl;
-	cout << "Matches found: " << endl;
-	
-	while (regex_search(s, match, rx)) {
-		for (auto mm : match)
-			cout << mm << endl;
-		s = match.suffix().str();
-	}*/
 	string s (argv[1]);
 	Url url(s);
 	cout << url.ToString() << endl;
