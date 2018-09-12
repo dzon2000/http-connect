@@ -11,7 +11,7 @@ using namespace std;
 int main(int argc, char *argv[]) {
 	string s (argv[1]);
 	Url url(s);
-	cout << url.ToString() << endl;
+	cout << url.toString() << endl;
 	url.open().send("not used");
 	return 0;
 }

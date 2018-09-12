@@ -5,17 +5,25 @@
 #include "header.h"
 using namespace std;
 
+struct RequestLine {
+	method_type method;
+	std::string host;
+	std::string path;
+	std::string port;
+};
+
 class Request {
 	int socket_desc;
 	string host;
 	string port;
 	string path;
+	RequestRequestLine header;
 public:
-	void send(string);
+	void send();
 	Request(int, string, string, string);
-	int readStream(char *buf);
-	Header createHTTPHeader(string, string, string, method_type);
-	string buildRequest(Header);
+	int readStream(char buf);
+	RequestLine createRequestLine(string, string, string, method_type);
+	string buildRequest(RequestLine);
 };
 
 Request::Request(int socket_des, string host, string port, string path) {
@@ -25,8 +33,8 @@ Request::Request(int socket_des, string host, string port, string path) {
 	this->path = path;
 }
 
-Header Request::createHTTPHeader(string  host, string port, string path, method_type method) {
-	Header h;
+RequestLine Request::createRequestLine(string  host, string port, string path, method_type method) {
+	RequestLine h;
 	h.host = host;
 	h.path = path;
 	h.port = port;
@@ -34,7 +42,7 @@ Header Request::createHTTPHeader(string  host, string port, string path, method_
 	return h;
 }
 
-string Request::buildRequest(Header h) {
+string Request::buildRequest(RequestLine h) {
 	string method;
 	if (h.method == GET) {
 		method = "GET";
@@ -49,7 +57,7 @@ string Request::buildRequest(Header h) {
 }
 
 void Request::send(string what) {
-	Header h = createHTTPHeader(host, port, path, GET);
+	RequestLine h = createRequestLine(host, port, path, GET);
 	string request = buildRequest(h);
 	char * req = new char [request.length()+1];
 	strcpy (req, request.c_str());

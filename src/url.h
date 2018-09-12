@@ -3,7 +3,7 @@
 
 #include <string>
 #include <regex>
-#include "connectionStream.h"
+#include "request.h"
 using namespace std;
 
 class Url {
@@ -15,8 +15,8 @@ class Url {
 
 public:
 	Url(string);
-	ConnectionStream open();
-	string ToString();
+	Request open();
+	string toString();
 };
 
 string Url::REGEX = "https?:\\/\\/([a-zA-Z0-9\\.]+):?(\\d*)(.*)";
@@ -34,14 +34,14 @@ Url::Url(string urlStr) {
 	}
 }
 
-string Url::ToString() {
+string Url::toString() {
 	stringstream ss;
 	ss << "Host: " << host << endl << "Port: " << port << endl << "Path: " << path << endl;
 	return ss.str();
 }
 
 
-ConnectionStream Url::open() {
+Request Url::open() {
 	struct addrinfo hints;
 	struct addrinfo *result;
 
@@ -67,6 +67,6 @@ ConnectionStream Url::open() {
 	if (connect_status == -1) {
 		throw "Could not connect socket";
 	}
-	return ConnectionStream(socket_desc, host, port, path);
+	return Request(socket_desc, host, port, path);
 }
 #endif
