@@ -12,6 +12,9 @@ int main(int argc, char *argv[]) {
 	string s (argv[1]);
 	Url url(s);
 	cout << url.toString() << endl;
-	url.open().send("not used");
+	Request req = url.open();
+	req.addRequestHeader("Accept", "application/json");
+	req.get();
+
 	return 0;
 }
