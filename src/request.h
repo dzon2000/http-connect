@@ -24,6 +24,7 @@ class Request {
 public:
 	void addRequestHeader(string, string);
 	void get();
+	void post();
 	Request(int, string, string, string);
 	int readStream(char buf);
 	RequestLine createRequestLine(string, string, string, method_type);
@@ -67,7 +68,7 @@ string Request::buildRequest(RequestLine h) {
 	for (auto it : headers) {
 		ss << it << "\r\n";
 	}
-	ss << "\r\n";
+	ss << "\r\n{\"user\": \"u1\"}\r\n";
 	string request = ss.str();
 	cout << request;
 	return request;
@@ -80,11 +81,39 @@ void Request::get() {
 	strcpy (req, request.c_str());
 	int sent_bytes = send(socket_desc, req, strlen(req), 0);
 	cout << "Sent: " << sent_bytes << endl;
-	char buf[2056];
+	char buf[2048];
 	try {
 		int byte_count;
-		while((byte_count = read(socket_desc, buf, sizeof(buf))) != 0) {
-			cout << buf;
+		while((byte_count = recv(socket_desc, buf, sizeof(buf),0)) > 0) {
+		//	for (int i = 0; i <= byte_count; i++) {
+		//		cout << (int) buf[i]  << " ";
+		//	}
+			cout << buf << endl;
+			if (buf[byte_count] == 0)
+				break;
+		}
+	} catch (const exception& e) {
+		cout << e.what() << endl;
+	}
+}
+
+void Request::post() {
+	RequestLine h = createRequestLine(host, port, path, POST);
+	string request = buildRequest(h);
+	char * req = new char [request.length()+1];
+	strcpy (req, request.c_str());
+	int sent_bytes = send(socket_desc, req, strlen(req), 0);
+	cout << "Sent: " << sent_bytes << endl;
+	char buf[2048];
+	try {
+		int byte_count;
+		while((byte_count = recv(socket_desc, buf, sizeof(buf),0)) > 0) {
+		//	for (int i = 0; i <= byte_count; i++) {
+		//		cout << (int) buf[i]  << " ";
+		//	}
+			cout << buf << endl;
+			if (buf[byte_count] == 0)
+				break;
 		}
 	} catch (const exception& e) {
 		cout << e.what() << endl;
