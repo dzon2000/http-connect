@@ -29,6 +29,8 @@ public:
 	int readStream(char buf);
 	RequestLine createRequestLine(string, string, string, method_type);
 	string buildRequest(RequestLine);
+private:
+	void make(method_type);
 };
 
 void Request::addRequestHeader(string key, string value) {
@@ -75,30 +77,15 @@ string Request::buildRequest(RequestLine h) {
 }
 
 void Request::get() {
-	RequestLine h = createRequestLine(host, port, path, GET);
-	string request = buildRequest(h);
-	char * req = new char [request.length()+1];
-	strcpy (req, request.c_str());
-	int sent_bytes = send(socket_desc, req, strlen(req), 0);
-	cout << "Sent: " << sent_bytes << endl;
-	char buf[2048];
-	try {
-		int byte_count;
-		while((byte_count = recv(socket_desc, buf, sizeof(buf),0)) > 0) {
-		//	for (int i = 0; i <= byte_count; i++) {
-		//		cout << (int) buf[i]  << " ";
-		//	}
-			cout << buf << endl;
-			if (buf[byte_count] == 0)
-				break;
-		}
-	} catch (const exception& e) {
-		cout << e.what() << endl;
-	}
+	make(GET);
 }
 
 void Request::post() {
-	RequestLine h = createRequestLine(host, port, path, POST);
+	make(POST);
+}
+
+void Request::make(method_type mt) {
+	RequestLine h = createRequestLine(host, port, path, mt);
 	string request = buildRequest(h);
 	char * req = new char [request.length()+1];
 	strcpy (req, request.c_str());
@@ -108,9 +95,6 @@ void Request::post() {
 	try {
 		int byte_count;
 		while((byte_count = recv(socket_desc, buf, sizeof(buf),0)) > 0) {
-		//	for (int i = 0; i <= byte_count; i++) {
-		//		cout << (int) buf[i]  << " ";
-		//	}
 			cout << buf << endl;
 			if (buf[byte_count] == 0)
 				break;

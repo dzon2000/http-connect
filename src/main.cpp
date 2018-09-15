@@ -15,7 +15,6 @@ void runIt(string s) {
 	Request req = url.open();
 	req.addRequestHeader("Accept", "application/json");
 	req.addRequestHeader("Content-Type", "application/json");
-	req.addRequestHeader("AppKey", "a99a2921-a80c-4a21-ae81-8a72a64461ac");
 	req.post();
 }
 
