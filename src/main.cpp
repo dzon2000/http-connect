@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include "url.h"
 #include <thread>
+#include "httpHeader.h"
 
 using namespace std;
 
@@ -15,6 +16,7 @@ void runIt(string s) {
 	Request req = url.open();
 	req.addRequestHeader("Accept", "application/json");
 	req.addRequestHeader("Content-Type", "application/json");
+	req.addRequestHeader("AppKey", "662cfb2f-a22b-440b-8c1f-591bd2d5b286");
 	req.post();
 }
 
