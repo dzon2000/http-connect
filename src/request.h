@@ -35,6 +35,7 @@ public:
 private:
 	Response make(method_type);
 	HttpHeader readHeader();
+	string readHeaderLine();
 };
 
 void Request::addRequestHeader(string key, string value) {
@@ -96,7 +97,7 @@ Response Request::make(method_type mt) {
 	strcpy (req, request.c_str());
 	int sent_bytes = send(socket_desc, req, strlen(req), 0);
 	cout << "Sent: " << sent_bytes << endl;
-	char buf[2048];
+//	char buf[2048];
 	try {
 /*		int byte_count;
 		while((byte_count = recv(socket_desc, buf, sizeof(buf), 0)) > 1) {
@@ -117,7 +118,6 @@ HttpHeader Request::readHeader() {
 	cout << "reading header..." << endl;
 	char buf[1];
 	int byte_count;
-	int wasCarriage = 0;
 	stringstream ss;
 	HttpHeader hh;
 	// Read http status
@@ -127,31 +127,40 @@ HttpHeader Request::readHeader() {
 			throw "No data to read";
 		if (buf[0] == '\r') { 
 			string header = ss.str();
-			hh = HttpHeader(200);
+			regex rx("\\s([\\d]{3})");
+			smatch match;
+			if (regex_search(header, match, rx)) {
+				hh = HttpHeader(stoi(match.str(1)));
+			}
 			ss.str(string());
 			break;
 		} else {
 			ss << buf[0];
 		}
 	}
-	while (true) {
-		byte_count = recv(socket_desc, buf, sizeof(buf), 0);
-		cout << (int) buf[0] << endl;
-		if (byte_count != 1)
-			throw "No data to read";
-		if (buf[0] == '\r') { 
-			wasCarriage = 1;
-			string header = ss.str();
-			hh.addAttribute(header);
-			ss.str(string());
-		}
-		else if (buf[0] == '\n' && wasCarriage) break;
-		else if (buf[0] == '\n') {
-		} else {
-			ss << buf[0];
-		}
+	string line;
+	while ((line = readHeaderLine()).length() != 1) {
+		hh.addAttribute(line);
 	}
 	return hh;
 }
+
+string Request::readHeaderLine() {
+	stringstream ss;
+	int byte_count;
+	char buf[1];
+	while (true) {
+		byte_count = recv(socket_desc, buf, sizeof(buf), 0);
+		if (byte_count != 1)
+			throw "No data to read";
+		if (buf[0] == '\r') { 
+			string header = ss.str();
+			return ss.str();
+		}
+		ss << buf[0];
+	}
+	return "";
+}
+
 #endif
 

@@ -42,9 +42,8 @@ HttpHeader::HttpHeader(int status) {
 }
 
 void HttpHeader::addAttribute(std::string attStr) {
-	std::cout << "Adding " << attStr << std::endl;
 	std::vector<std::string> splitt = split(attStr, ':');
-	attributes[splitt.at(0)] = std::regex_replace(splitt.at(1), std::regex("^ +| +$|( ) +"), "$1");
+	attributes[splitt.at(0)] = std::regex_replace(splitt.at(1), std::regex("^\\s+|\\s+$|(\\s)\\s+"), "$1");
 }
 
 std::string HttpHeader::getAttribute(std::string att) {
@@ -53,9 +52,9 @@ std::string HttpHeader::getAttribute(std::string att) {
 
 std::string HttpHeader::toString() {
 	std::stringstream ss;
-	ss << status << std::endl;
+	ss << status;
 	for (auto const& x : attributes) {
-		ss << x.first << " : " << x.second << std::endl;
+		ss << x.first << " : " << x.second;
 	}
 	return ss.str();
 }
