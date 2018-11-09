@@ -96,12 +96,13 @@ Response Request::make(method_type mt, string body) {
 	int sent_bytes = send(socket_desc, request.data(), static_cast<ssize_t>(request.size()), 0);
 	cout << endl << "Sent: " << sent_bytes << endl;
 	char buf[2048];
+	HttpHeader hh;
+	stringstream ss;
 	try {
-		HttpHeader hh = readHeader();
-		cout << hh.toString();
+		hh = readHeader();
 		int byte_count;
 		while((byte_count = recv(socket_desc, buf, sizeof(buf), 0)) > 1) {
-			cout << buf;
+			ss << buf;
 			if (buf[byte_count - 1] == '\n' && buf[byte_count - 2] == '\r') {
 				break;
 			}
@@ -109,7 +110,7 @@ Response Request::make(method_type mt, string body) {
 	} catch (const exception& e) {
 		cout << e.what() << endl;
 	}
-	return Response();
+	return Response(hh, ss.str());
 }
 
 HttpHeader Request::readHeader() {
