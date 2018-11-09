@@ -52,7 +52,7 @@ std::string HttpHeader::getAttribute(std::string att) {
 
 std::string HttpHeader::toString() {
 	std::stringstream ss;
-	ss << status;
+	ss << "Status: " << status;
 	for (auto const& x : attributes) {
 		ss << x.first << " : " << x.second;
 	}

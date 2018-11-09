@@ -4,3 +4,5 @@
 *.orig
 # Out programs
 *.out
+compiling_error.txt
+main

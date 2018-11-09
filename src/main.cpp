@@ -10,20 +10,21 @@
 
 using namespace std;
 
-void runIt(string s) {
-	Url url(s);
+void runIt(string requestUrl, string content) {
+	Url url(requestUrl);
 	cout << url.toString() << endl;
 	Request req = url.open();
-	req.addRequestHeader("Accept", "application/json");
 	req.addRequestHeader("Content-Type", "application/json");
-	req.addRequestHeader("AppKey", "662cfb2f-a22b-440b-8c1f-591bd2d5b286");
-	req.post();
+	req.addRequestHeader("Accept", "application/json");
+	req.addRequestHeader("AppKey", "2ad57305-9331-4cbc-a6a2-613ffeb0c54c");
+	req.post(content);
 }
 
 int main(int argc, char *argv[]) {
-	string s (argv[1]);
-	thread first (runIt, s);
+	string url (argv[1]);
+  string content (argv[2]);
+	thread first (runIt, url, content);
 	first.join();
-	cout << "Main thread finished" << endl;
+	cout << endl << "Main thread finished..." << endl;
 	return 0;
 }

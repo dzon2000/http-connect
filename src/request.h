@@ -27,13 +27,13 @@ class Request {
 public:
 	void addRequestHeader(string, string);
 	Response get();
-	Response post();
+	Response post(string);
 	Request(int, string, string, string);
 	int readStream(char buf);
 	RequestLine createRequestLine(string, string, string, method_type);
-	string buildRequest(RequestLine);
+	string buildRequest(RequestLine, string);
 private:
-	Response make(method_type);
+	Response make(method_type, string body="");
 	HttpHeader readHeader();
 	string readHeaderLine();
 };
@@ -61,8 +61,7 @@ RequestLine Request::createRequestLine(string  host, string port, string path, m
 	return h;
 }
 
-string Request::buildRequest(RequestLine h) {
-	cout << "Size: " << headers.size() << endl;
+string Request::buildRequest(RequestLine h, string body) {
 	string method;
 	if (h.method == GET) {
 		method = "GET";
@@ -75,8 +74,9 @@ string Request::buildRequest(RequestLine h) {
 	for (auto it : headers) {
 		ss << it << "\r\n";
 	}
+	ss << "Content-Length: " << std::to_string(body.size()) << "\r\n";
 	ss << "\r\n";
-	//ss << "\r\n{\"user\": \"u1\"}\r\n";
+	ss << body;
 	string request = ss.str();
 	cout << request;
 	return request;
@@ -86,28 +86,26 @@ Response Request::get() {
 	return make(GET);
 }
 
-Response Request::post() {
-	return make(POST);
+Response Request::post(string body="") {
+	return make(POST, body);
 }
 
-Response Request::make(method_type mt) {
+Response Request::make(method_type mt, string body) {
 	RequestLine h = createRequestLine(host, port, path, mt);
-	string request = buildRequest(h);
-	char * req = new char [request.length() + 1];
-	strcpy (req, request.c_str());
-	int sent_bytes = send(socket_desc, req, strlen(req), 0);
-	cout << "Sent: " << sent_bytes << endl;
-//	char buf[2048];
+	string request = buildRequest(h, body);
+	int sent_bytes = send(socket_desc, request.data(), static_cast<ssize_t>(request.size()), 0);
+	cout << endl << "Sent: " << sent_bytes << endl;
+	char buf[2048];
 	try {
-/*		int byte_count;
+		HttpHeader hh = readHeader();
+		cout << hh.toString();
+		int byte_count;
 		while((byte_count = recv(socket_desc, buf, sizeof(buf), 0)) > 1) {
 			cout << buf;
 			if (buf[byte_count - 1] == '\n' && buf[byte_count - 2] == '\r') {
 				break;
 			}
 		}
-*/		HttpHeader hh = readHeader();
-		cout << hh.toString();
 	} catch (const exception& e) {
 		cout << e.what() << endl;
 	}
@@ -115,7 +113,6 @@ Response Request::make(method_type mt) {
 }
 
 HttpHeader Request::readHeader() {
-	cout << "reading header..." << endl;
 	char buf[1];
 	int byte_count;
 	stringstream ss;
@@ -125,7 +122,7 @@ HttpHeader Request::readHeader() {
 		byte_count = recv(socket_desc, buf, sizeof(buf), 0);
 		if (byte_count != 1)
 			throw "No data to read";
-		if (buf[0] == '\r') { 
+		if (buf[0] == '\r') {
 			string header = ss.str();
 			regex rx("\\s([\\d]{3})");
 			smatch match;
@@ -153,7 +150,7 @@ string Request::readHeaderLine() {
 		byte_count = recv(socket_desc, buf, sizeof(buf), 0);
 		if (byte_count != 1)
 			throw "No data to read";
-		if (buf[0] == '\r') { 
+		if (buf[0] == '\r') {
 			string header = ss.str();
 			return ss.str();
 		}
@@ -163,4 +160,3 @@ string Request::readHeaderLine() {
 }
 
 #endif
-
